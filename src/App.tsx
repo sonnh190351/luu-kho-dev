@@ -9,6 +9,7 @@ import "@fontsource/andada-pro/400.css";
 import "@fontsource/be-vietnam-pro/400.css";
 
 import {Notifications} from "@mantine/notifications";
+import HomepageLayout from "./layouts/homepage/homepage.layout.tsx";
 
 export default function App(){
 

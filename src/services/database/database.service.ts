@@ -1,0 +1,40 @@
+import {createClient, type SupabaseClient} from "@supabase/supabase-js";
+import type {Database} from "./database.types.ts";
+import type {DatabaseTables} from "../../enums/tables.ts";
+
+const supabaseUrl = import.meta.env.VITE_APP_SUPABASE_URL!;
+const supabaseKey = import.meta.env.VITE_APP_SUPABASE_PUBLISHABLE_DEFAULT_KEY!;
+
+export default class DatabaseService {
+    private static instance: DatabaseService;
+
+    private readonly database: SupabaseClient;
+
+    private constructor() {
+        this.database = createClient<Database>(supabaseUrl, supabaseKey);
+    }
+
+    public static getInstance() {
+        if (!DatabaseService.instance) {
+            DatabaseService.instance = new DatabaseService();
+        }
+        return DatabaseService.instance;
+    }
+
+    public getAll(table: DatabaseTables){
+        return this.database.from(table).select();
+    }
+
+    public async getByField(table: DatabaseTables, column: string, value: string) {
+        await this.database.from(table).select().eq(column, value)
+    }
+
+    public async add(table: DatabaseTables, data: any) {
+        console.log(data)
+        await this.database.from(table).insert(data);
+    }
+
+    public async delete(table: DatabaseTables, id: string) {
+        await this.database.from(table).delete().eq('id', id)
+    }
+}
