@@ -10,13 +10,21 @@ import "@fontsource/be-vietnam-pro/400.css";
 
 import {Notifications} from "@mantine/notifications";
 import HomepageLayout from "./layouts/homepage/homepage.layout.tsx";
+import LoginLayout from "./layouts/auth/login/login.layout.tsx";
+import ProtectedRoute from "./routes/protected.route.ts";
 
 export default function App(){
 
     const router = createBrowserRouter([
         {
             path: "*",
-            element: <HomepageLayout />
+            element: <ProtectedRoute>
+                <HomepageLayout />
+            </ProtectedRoute>
+        },
+        {
+            path: "/login",
+            element: <LoginLayout />
         }
     ])
 
