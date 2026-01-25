@@ -9,10 +9,13 @@ import {
     Container,
     Checkbox,
     Group,
-    Stack,
+    Stack, LoadingOverlay,
 } from '@mantine/core';
 import { useForm } from '@mantine/form';
 import { IconMail, IconLock } from '@tabler/icons-react';
+import AuthService from "../../../services/auth/auth.service.ts";
+import {NotificationsService} from "../../../services/notifications/notifications.service.ts";
+import {LocalStorage} from "../../../enums/localStorage.ts";
 
 interface LoginFormValues {
     email: string;
@@ -21,6 +24,11 @@ interface LoginFormValues {
 }
 
 export default function LoginLayout() {
+    const cachedData = localStorage.getItem(LocalStorage.userData)
+    if(cachedData) {
+        window.location.href = "/"
+    }
+
     const [isLoading, setIsLoading] = useState(false);
 
     const form = useForm<LoginFormValues>({
@@ -46,21 +54,30 @@ export default function LoginLayout() {
     const handleSubmit = async (values: LoginFormValues) => {
         setIsLoading(true);
 
-        // Simulate API call
-        setTimeout(() => {
-            console.log('Login submitted:', values);
-            alert(`Login successful!\nEmail: ${values.email}\nRemember me: ${values.rememberMe}`);
-            setIsLoading(false);
-        }, 1500);
+        const authService = new AuthService()
+
+        const response = await authService.login(values.email, values.password)
+
+        if(response.status) {
+            NotificationsService.success("Login success", "User will be re-directed after 2 seconds!")
+            setTimeout(() => {
+                window.location.href = "/"
+            }, 2000)
+        } else {
+            NotificationsService.error("Login Failed", response.message!)
+        }
+
+        setIsLoading(false)
     };
 
     return (
         <Container size={420} my={40} style={{ minHeight: '100vh', display: 'flex', alignItems: 'center' }}>
+            <LoadingOverlay visible={isLoading} />
             <Paper radius="md" p="xl" withBorder style={{ width: '100%' }}>
                 <Stack gap="md">
                     {/* Header */}
                     <div style={{ textAlign: 'center' }}>
-                        <IconLock size={48} style={{ margin: '0 auto', color: '#228be6' }} />
+                        <img src={"/logo.png"} width={100} alt={"logo"} />
                         <Title order={2} mt="md">
                             Welcome Back
                         </Title>

@@ -14,6 +14,10 @@ export default class DatabaseService {
         this.database = createClient<Database>(supabaseUrl, supabaseKey);
     }
 
+    public getDatabase(): SupabaseClient{
+        return this.database;
+    }
+
     public static getInstance() {
         if (!DatabaseService.instance) {
             DatabaseService.instance = new DatabaseService();
