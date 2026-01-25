@@ -11,6 +11,12 @@ import {
     IconTemplate, IconUser, IconUserDollar
 } from "@tabler/icons-react";
 import ItemsTab from "./components/items.tab.tsx";
+import CategoriesTab from "./components/categories.tab.tsx";
+import TagsTab from "./components/tags.tab.tsx";
+import InventoriesTab from "./components/inventories.tab.tsx";
+import WarehousesTab from "./components/warehouses.tab.tsx";
+import SuppliersTab from "./components/suppliers.tab.tsx";
+import UsersTab from "./components/users.tab.tsx";
 
 const openMenuWidth = 200;
 
@@ -25,32 +31,32 @@ const adminTabs = [
     {
         icon: <IconCategory/>,
         title: "Categories",
-        item: <ItemsTab />,
+        item: <CategoriesTab />,
     },
     {
         icon: <IconTag/>,
         title: "Tags",
-        item: <ItemsTab />,
+        item: <TagsTab />,
     },
     {
         icon: <IconPackage/>,
         title: "Inventories",
-        item: <ItemsTab />,
+        item: <InventoriesTab />,
     },
     {
         icon: <IconBuildingWarehouse/>,
         title: "Warehouses",
-        item: <ItemsTab />,
+        item: <WarehousesTab />,
     },
     {
         icon: <IconUserDollar/>,
         title: "Suppliers",
-        item: <ItemsTab />,
+        item: <SuppliersTab />,
     },
     {
         icon: <IconUser/>,
         title: "Users",
-        item: <ItemsTab />,
+        item: <UsersTab />,
     },
 ]
 
