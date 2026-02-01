@@ -10,13 +10,13 @@ import {
     IconTag,
     IconTemplate, IconUser, IconUserDollar
 } from "@tabler/icons-react";
-import ItemsTab from "./components/items.tab.tsx";
-import CategoriesTab from "./components/categories.tab.tsx";
-import TagsTab from "./components/tags.tab.tsx";
-import InventoriesTab from "./components/inventories.tab.tsx";
-import WarehousesTab from "./components/warehouses.tab.tsx";
-import SuppliersTab from "./components/suppliers.tab.tsx";
-import UsersTab from "./components/users.tab.tsx";
+import ItemsTab from "./components/items/items.tab.tsx";
+import CategoriesTab from "./components/categories/categories.tab.tsx";
+import TagsTab from "./components/tags/tags.tab.tsx";
+import InventoriesTab from "./components/inventories/inventories.tab.tsx";
+import WarehousesTab from "./components/warehouses/warehouses.tab.tsx";
+import SuppliersTab from "./components/suppliers/suppliers.tab.tsx";
+import UsersTab from "./components/users/users.tab.tsx";
 
 const openMenuWidth = 200;
 

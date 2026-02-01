@@ -1,8 +1,7 @@
 export interface Inventories {
     created_at: string
+    date: string | null
     id: number
-    item_id: number | null
-    stock: number | null
     updated_at: string | null
     warehouse_id: number | null
 }

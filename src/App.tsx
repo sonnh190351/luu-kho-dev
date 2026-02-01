@@ -12,6 +12,7 @@ import LoginLayout from "./layouts/auth/login/login.layout.tsx";
 import ProtectedRoute from "./routes/protected.route.ts";
 import NavigationBar from "./components/navigation/navigationBar.tsx";
 import AdminLayout from "./layouts/admin/admin.layout.tsx";
+import { ModalsProvider } from "@mantine/modals";
 
 export default function App(){
 
@@ -43,7 +44,9 @@ export default function App(){
     return (
         <MantineProvider theme={theme} defaultColorScheme={"dark"}>
             <Notifications />
-            <RouterProvider router={router} />
+            <ModalsProvider>
+                <RouterProvider router={router} />
+            </ModalsProvider>
         </MantineProvider>
     )
 }

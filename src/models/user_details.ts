@@ -7,6 +7,6 @@ export interface UserDetails {
     first_name: string | null
     id: number
     last_name: string | null
-    roles: string[]
+    role: number
     updated_at: string | null
 }
