@@ -3,6 +3,9 @@ import {createBrowserRouter, RouterProvider} from "react-router";
 
 import '@mantine/core/styles.css';
 import '@mantine/notifications/styles.css';
+import "./app.scss";
+
+import 'mantine-datatable/styles.layer.css';
 
 import "@fontsource/be-vietnam-pro/200.css";
 
