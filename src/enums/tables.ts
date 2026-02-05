@@ -7,4 +7,5 @@ export enum DatabaseTables {
     Categories = "categories",
     Suppliers = "suppliers",
     UserDetails = "user_details",
+    Requests = "requests",
 }

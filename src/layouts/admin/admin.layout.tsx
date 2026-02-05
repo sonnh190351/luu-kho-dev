@@ -1,12 +1,10 @@
-import {ActionIcon, Container, Group, Stack, Text} from "@mantine/core";
+import {ActionIcon, Container, Divider, Group, Stack, Text} from "@mantine/core";
 import {BORDER_COLOR, NAV_BAR_HEIGHT} from "../../enums/styling.ts";
 import {useRef, useState} from "react";
-import gsap from "gsap"
+
 import {
     IconBuildingWarehouse,
-    IconCategory,
-    IconChevronLeft,
-    IconChevronRight, IconPackage,
+    IconCategory, IconPackage, IconReceipt,
     IconTag,
     IconTemplate, IconUser, IconUserDollar
 } from "@tabler/icons-react";
@@ -17,70 +15,86 @@ import InventoriesTab from "./components/inventories/inventories.tab.tsx";
 import WarehousesTab from "./components/warehouses/warehouses.tab.tsx";
 import SuppliersTab from "./components/suppliers/suppliers.tab.tsx";
 import UsersTab from "./components/users/users.tab.tsx";
+import RequestsTab from "./components/requests/requests.tab.tsx";
+import type {TabGroup} from "./admin.types.ts";
 
 const openMenuWidth = 200;
 
-const closedMenuWidth = 50;
-
-const adminTabs = [
-    {
-        icon: <IconTemplate/>,
-        title: "Items",
-        item: <ItemsTab />,
-    },
-    {
-        icon: <IconCategory/>,
-        title: "Categories",
-        item: <CategoriesTab />,
-    },
-    {
-        icon: <IconTag/>,
-        title: "Tags",
-        item: <TagsTab />,
-    },
-    {
-        icon: <IconPackage/>,
-        title: "Inventories",
-        item: <InventoriesTab />,
-    },
-    {
-        icon: <IconBuildingWarehouse/>,
-        title: "Warehouses",
-        item: <WarehousesTab />,
-    },
-    {
-        icon: <IconUserDollar/>,
-        title: "Suppliers",
-        item: <SuppliersTab />,
-    },
-    {
-        icon: <IconUser/>,
-        title: "Users",
-        item: <UsersTab />,
-    },
-]
-
-
 export default function AdminLayout() {
+
+    const adminItems = [
+        <ItemsTab/>,
+        <CategoriesTab/>,
+        <TagsTab/>,
+        <InventoriesTab/>,
+        <WarehousesTab/>,
+        <SuppliersTab/>,
+        <UsersTab/>,
+        <RequestsTab/>,
+    ]
+
+    const adminTabs: TabGroup[] = [
+        {
+            name: "Items",
+            items: [
+                {
+                    icon: <IconTemplate/>,
+                    title: "Items",
+                    index: 0
+                },
+                {
+                    icon: <IconCategory/>,
+                    title: "Categories",
+                    index: 1
+                },
+                {
+                    icon: <IconTag/>,
+                    title: "Tags",
+                    index: 2
+                },
+            ]
+        },
+        {
+            name: "Inventory",
+            items: [
+                {
+                    icon: <IconPackage/>,
+                    title: "Inventories",
+                    index: 3
+                },
+                {
+                    icon: <IconBuildingWarehouse/>,
+                    title: "Warehouses",
+                    index: 4
+                },
+            ]
+        },
+        {
+            name: "Users",
+            items: [
+                {
+                    icon: <IconUserDollar/>,
+                    title: "Suppliers",
+                    index: 5
+                },
+                {
+                    icon: <IconUser/>,
+                    title: "Users",
+                    index: 6
+                },
+                {
+                    icon: <IconReceipt/>,
+                    title: "Requests",
+                    index: 7
+                },
+            ]
+        },
+    ]
 
     const menuRef = useRef<HTMLDivElement>(null);
     const containerRef = useRef<HTMLDivElement>(null);
 
-    const [openMenu, setOpenMenu] = useState<boolean>(false)
-
     const [currentTab, setCurrentTab] = useState<number>(0);
-
-    function toggleMenu() {
-        const tl = gsap.timeline({})
-
-        tl.to(menuRef.current, {
-            width: openMenu ? openMenuWidth : closedMenuWidth,
-        }).to(containerRef.current, {
-            marginLeft: openMenu ? openMenuWidth : closedMenuWidth,
-        }, "<")
-
-        setOpenMenu(!openMenu)
-    }
 
     return (
         <Container fluid style={{
@@ -99,34 +113,46 @@ export default function AdminLayout() {
                 }}>
                     <Stack p={5} gap={0}>
                         {
-                            adminTabs.map((tab, index) => (
-                                <Group p={5} onClick={() => setCurrentTab(index)} key={`admin-tab-${index}`} mt={5} style={{
-                                    overflow: 'hidden',
-                                    position: 'relative',
-                                    cursor: 'pointer',
-                                    backgroundColor: index === currentTab ? "rgba(255,255,255, 0.05)" : 'transparent',
-                                    borderRadius: '5px'
-                                }}>
-                                    <ActionIcon variant={"outline"} color={'white.5'} onClick={toggleMenu}>
-                                        {
-                                            tab.icon
-                                        }
-                                    </ActionIcon>
-                                    <Text style={{
-                                        position: 'absolute',
-                                        left: 50,
+                            adminTabs.map((tab: TabGroup, tab_index: number) => (
+                                <Stack gap={0}>
+                                    <Text mt={'sm'} pl={10} style={{
+                                        fontWeight: 700
                                     }}>
-                                        {tab.title}
+                                        {
+                                            tab.name
+                                        }
                                     </Text>
-                                </Group>
+                                    {
+                                        tab.items.map((item, item_index: number) => <Group p={5}
+                                                                                           onClick={() => setCurrentTab(item.index)}
+                                                                                           key={`admin-tab-${tab_index}-${item_index}`}
+                                                                                           mt={5} style={{
+                                            overflow: 'hidden',
+                                            position: 'relative',
+                                            cursor: 'pointer',
+                                            backgroundColor: item.index === currentTab ? "rgba(255,255,255, 0.05)" : 'transparent',
+                                            borderRadius: '5px'
+                                        }}>
+                                            <ActionIcon variant={"outline"} color={'white.5'}>
+                                                {
+                                                    item.icon
+                                                }
+                                            </ActionIcon>
+                                            <Text style={{
+                                                position: 'absolute',
+                                                left: 50,
+                                            }}>
+                                                {item.title}
+                                            </Text>
+                                        </Group>)
+                                    }
+                                    {
+                                        tab_index < adminTabs.length - 1 && <Divider mb={'xs'} mt={'sm'}/>
+                                    }
+                                </Stack>
                             ))
                         }
                     </Stack>
-                    <ActionIcon variant={"outline"} ml={'xs'} mb={'xs'} color={'white.5'} onClick={toggleMenu}>
-                        {
-                            openMenu ? <IconChevronRight/> : <IconChevronLeft/>
-                        }
-                    </ActionIcon>
                 </Stack>
                 <div ref={containerRef} style={{
                     width: "100%",
@@ -134,7 +160,7 @@ export default function AdminLayout() {
                     zIndex: -1,
                     marginLeft: openMenuWidth,
                 }}>{
-                    adminTabs[currentTab].item
+                    adminItems[currentTab]
                 }</div>
             </Group>
         </Container>

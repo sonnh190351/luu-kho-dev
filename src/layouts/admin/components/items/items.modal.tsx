@@ -1,9 +1,13 @@
 import type {Items} from "../../../../models/items.ts";
-import {Button, Dialog, LoadingOverlay, Modal, Stack} from "@mantine/core";
+import {Button, Modal, MultiSelect, NumberInput, Select, Stack, TextInput} from "@mantine/core";
 import {useEffect, useState} from "react";
 import type {Suppliers} from "../../../../models/suppliers.ts";
 import type {Categories} from "../../../../models/categories.ts";
 import {useForm} from "@mantine/form";
+import InventoryService from "../../../../services/operations/inventory.service.ts";
+import {DatabaseTables} from "../../../../enums/tables.ts";
+import {QUANTITY_TYPES} from "../../../../enums/data.ts";
+import type {Tags} from "../../../../models/tags.ts";
 
 interface ItemsModalProps {
     item: Items | null;
@@ -21,12 +25,13 @@ interface ItemFormValues {
     warning_limit: number
 }
 
-export default function ItemsModal({ item, open = false, close, refresh }: ItemsModalProps){
+export default function ItemsModal({item, open = false, close, refresh}: ItemsModalProps) {
 
     const isEdit = item !== null;
 
     const [suppliers, setSuppliers] = useState<Suppliers[]>([])
     const [categories, setCategories] = useState<Categories[]>([])
+    const [tags, setTags] = useState<Tags[]>([])
 
     const form = useForm<ItemFormValues>({
         initialValues: {
@@ -37,21 +42,31 @@ export default function ItemsModal({ item, open = false, close, refresh }: Items
             tags: isEdit ? item.tags! : [],
             warning_limit: isEdit ? item?.warning_limit! : 0,
         },
-        validate: {
-        },
+        validate: {},
     });
 
     useEffect(() => {
         (async () => await fetchSuppliers())();
         (async () => await fetchCategories())();
+        (async () => await fetchTags())();
     }, []);
 
     async function fetchSuppliers() {
-        setSuppliers([])
+        const service = InventoryService.getInstance();
+        const data = await service.getAllRows(DatabaseTables.Suppliers)
+        setSuppliers(data)
     }
 
     async function fetchCategories() {
-        setCategories([]);
+        const service = InventoryService.getInstance();
+        const data = await service.getAllRows(DatabaseTables.Categories)
+        setCategories(data)
+    }
+
+    async function fetchTags() {
+        const service = InventoryService.getInstance();
+        const data = await service.getAllRows(DatabaseTables.Tags)
+        setTags(data)
     }
 
     function handleSubmit() {
@@ -61,7 +76,51 @@ export default function ItemsModal({ item, open = false, close, refresh }: Items
     return (
         <Modal opened={open} onClose={close} centered title={isEdit ? "Edit Item" : "Add Item"}>
             <form onSubmit={form.onSubmit(handleSubmit)}>
-                <Stack gap="md">
+                <Stack gap="xs">
+                    <TextInput required label={"Name"} value={form.values.name} onChange={(e) => form.setValues({
+                        name: e.target.value,
+                    })} />
+
+                    <Select value={String(form.values.supplier_id)} onChange={(value) => {
+                        if (value) {
+                            form.setValues({
+                                supplier_id: Number(value)
+                            })
+                        }
+                    }} required searchable label={'Supplier'} data={suppliers.map((s) => {
+                        return {label: s.name!, value: String(s.id)}
+                    })}/>
+
+                    <Select value={String(form.values.category_id)} onChange={(value) => {
+                        if (value) {
+                            form.setValues({
+                                category_id: Number(value)
+                            })
+                        }
+                    }} required searchable label={'Category'} data={categories.map((s) => {
+                        return {label: s.name!, value: String(s.id)}
+                    })}/>
+
+                    <MultiSelect value={form.values.tags} onChange={(value) => {
+                        form.setValues({
+                            tags: value
+                        })
+                    }} required searchable label={'Tags'} data={tags.map((s) => {
+                        return {label: s.name!, value: String(s.id)}
+                    })}/>
+
+                    <Select value={form.values.quantity_type} onChange={(value) => {
+                        if (value) {
+                            form.setValues({
+                                quantity_type: value
+                            })
+                        }
+                    }} required searchable label={'Quantity Type'} data={QUANTITY_TYPES}/>
+
+                    <NumberInput required label={"Warning Limit"} value={form.values.name} onChange={(e) => form.setValues({
+                        warning_limit: Number(e)
+                    })} />
+
                     <Button type="submit" fullWidth mt="md">
                         Submit
                     </Button>

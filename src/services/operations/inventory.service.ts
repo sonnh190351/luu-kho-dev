@@ -19,8 +19,8 @@ export default class InventoryService {
         return InventoryService.instance;
     }
 
-    public async getItems(){
-        const response = await this.database.getAll(DatabaseTables.Items)
+    public async getAllRows(table: DatabaseTables){
+        const response = await this.database.getAll(table)
         console.log(response)
 
         if(response.error){
@@ -30,4 +30,5 @@ export default class InventoryService {
 
         return response.data
     }
+
 }
