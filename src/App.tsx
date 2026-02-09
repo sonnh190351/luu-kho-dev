@@ -1,41 +1,52 @@
-import {createTheme, MantineProvider} from "@mantine/core";
-import {createBrowserRouter, RouterProvider} from "react-router";
+import { createTheme, MantineProvider } from "@mantine/core";
+import { createBrowserRouter, RouterProvider } from "react-router";
 
-import '@mantine/core/styles.css';
-import '@mantine/notifications/styles.css';
+import "@mantine/core/styles.css";
+import "@mantine/notifications/styles.css";
 import "./app.scss";
 
-import 'mantine-datatable/styles.layer.css';
+import "mantine-datatable/styles.layer.css";
 
 import "@fontsource/be-vietnam-pro/200.css";
 
-import {Notifications} from "@mantine/notifications";
+import { Notifications } from "@mantine/notifications";
 
 import LoginLayout from "./layouts/auth/login/login.layout.tsx";
 import ProtectedRoute from "./routes/protected.route.ts";
 import NavigationBar from "./components/navigation/navigationBar.tsx";
 import AdminLayout from "./layouts/admin/admin.layout.tsx";
 import { ModalsProvider } from "@mantine/modals";
+import UserDetailsLayout from "./layouts/user_details/user.layout.tsx";
 
-export default function App(){
-
+export default function App() {
     const router = createBrowserRouter([
         {
             path: "*",
-            element: <ProtectedRoute>
-                <NavigationBar />
-                <AdminLayout />
-            </ProtectedRoute>
+            element: (
+                <ProtectedRoute>
+                    <NavigationBar />
+                    <AdminLayout />
+                </ProtectedRoute>
+            ),
+        },
+        {
+            path: "/details",
+            element: (
+                <ProtectedRoute>
+                    <NavigationBar />
+                    <UserDetailsLayout />
+                </ProtectedRoute>
+            ),
         },
         {
             path: "/login",
-            element: <LoginLayout />
-        }
-    ])
+            element: <LoginLayout />,
+        },
+    ]);
 
     const theme = createTheme({
         fontFamily: "Be Vietnam Pro",
-    })
+    });
 
     return (
         <MantineProvider theme={theme} defaultColorScheme={"dark"}>
@@ -44,5 +55,5 @@ export default function App(){
                 <RouterProvider router={router} />
             </ModalsProvider>
         </MantineProvider>
-    )
+    );
 }

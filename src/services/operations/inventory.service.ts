@@ -21,7 +21,6 @@ export default class InventoryService {
 
     public async getAllRows(table: DatabaseTables){
         const response = await this.database.getAll(table)
-        console.log(response)
 
         if(response.error){
             NotificationsService.error("Inventory Service", `Failed to get items: ${response.error}`)

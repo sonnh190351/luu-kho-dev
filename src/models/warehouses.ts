@@ -1,8 +1,7 @@
 export interface Warehouses {
     address: string | null
-    created_at: string
     id: number
     name: string | null
-    owner_id: number | null
+    created_at: string
     updated_at: string | null
 }

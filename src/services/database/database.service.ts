@@ -30,11 +30,10 @@ export default class DatabaseService {
     }
 
     public async getByField(table: DatabaseTables, column: string, value: string) {
-        await this.database.from(table).select().eq(column, value)
+        return await this.database.from(table).select().eq(column, value)
     }
 
     public async add(table: DatabaseTables, data: any) {
-        console.log(data)
         await this.database.from(table).insert(data);
     }
 

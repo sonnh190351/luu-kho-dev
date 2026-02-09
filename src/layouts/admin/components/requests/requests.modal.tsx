@@ -1,37 +1,43 @@
-import type {Requests} from "../../../../models/requests.ts";
-import {Button, Modal, Stack} from "@mantine/core";
-import {useForm} from "@mantine/form";
+import { Button, Modal, Stack } from "@mantine/core";
+import { useForm } from "@mantine/form";
+import type { Requests } from "../../../../models/requests.ts";
 
 interface RequestsModalProps {
     request: Requests | null;
-    open: boolean,
-    refresh: any
-    close: any
+    open: boolean;
+    refresh: any;
+    close: any;
 }
 
-interface RequestFormValues {
-    name: string
+interface RequestsFormValues {
+    name: string;
 }
 
-export default function RequestsModal({ request, open = false, close, refresh }: RequestsModalProps){
-
+export default function RequestsModal({
+    request,
+    open = false,
+    close,
+    refresh,
+}: RequestsModalProps) {
     const isEdit = request !== null;
 
-    const form = useForm<RequestFormValues>({
+    const form = useForm<RequestsFormValues>({
         initialValues: {
-            name: ""
+            name: isEdit ? request.name! : "",
         },
-        validate: {
-        },
+        validate: {},
     });
 
-
     function handleSubmit() {
-        refresh()
+        refresh();
     }
 
     return (
-        <Modal opened={open} onClose={close} centered title={isEdit ? "Edit Request" : "Add Request"}>
+        <Modal
+            opened={open}
+            onClose={close}
+            centered
+            title={isEdit ? "Edit Request" : "Add Request"}>
             <form onSubmit={form.onSubmit(handleSubmit)}>
                 <Stack gap="md">
                     <Button type="submit" fullWidth mt="md">
@@ -40,5 +46,5 @@ export default function RequestsModal({ request, open = false, close, refresh }:
                 </Stack>
             </form>
         </Modal>
-    )
+    );
 }
