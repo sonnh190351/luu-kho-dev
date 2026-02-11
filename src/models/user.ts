@@ -9,4 +9,6 @@ export interface UserDetails {
     last_name: string | null
     role: number
     updated_at: string | null
+    email?: string
+    password?: string
 }

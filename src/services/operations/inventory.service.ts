@@ -30,4 +30,7 @@ export default class InventoryService {
         return response.data
     }
 
+    public async getUsers(){
+        return await this.database.getUsers();
+    }
 }
