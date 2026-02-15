@@ -1,6 +1,10 @@
 import { Button, Modal, Stack, TextInput } from "@mantine/core";
 import { useForm } from "@mantine/form";
 import type { Suppliers } from "../../../../models/suppliers.ts";
+import { useEffect } from "react";
+import InventoryService from "../../../../services/operations/inventory.service.ts";
+import { NotificationsService } from "../../../../services/notifications/notifications.service.ts";
+import { DatabaseTables } from "../../../../enums/tables.ts";
 
 interface SuppliersModalProps {
     supplier: Suppliers | null;
@@ -11,6 +15,7 @@ interface SuppliersModalProps {
 
 interface SuppliersFormValues {
     name: string;
+    address: string;
 }
 
 export default function SuppliersModal({
@@ -19,17 +24,59 @@ export default function SuppliersModal({
     close,
     refresh,
 }: SuppliersModalProps) {
-    const isEdit = supplier !== null;
+    const isEdit = Boolean(supplier);
 
     const form = useForm<SuppliersFormValues>({
         initialValues: {
-            name: isEdit ? supplier.name! : "",
+            name: "",
+            address: "",
         },
         validate: {},
     });
 
-    function handleSubmit() {
-        refresh();
+    useEffect(() => {
+        if (supplier) {
+            form.setValues({
+                name: supplier.name!,
+                address: supplier.address!,
+            });
+        }
+    }, [isEdit]);
+
+    function handleClose() {
+        form.reset();
+        close();
+    }
+
+    async function handleSubmit() {
+        try {
+            const service = InventoryService.getInstance();
+
+            if (isEdit) {
+                await service.editItemName(DatabaseTables.Suppliers, {
+                    id: supplier?.id,
+                    ...form.getValues(),
+                });
+            } else {
+                await service.addItemWithUniqueName(
+                    DatabaseTables.Suppliers,
+                    form.getValues(),
+                );
+            }
+
+            refresh();
+            handleClose();
+
+            NotificationsService.success(
+                `${isEdit ? "Edit" : "Add"} Supplier`,
+                "New supplier has been added successfully!",
+            );
+        } catch (e: any) {
+            NotificationsService.error(
+                `${isEdit ? "Edit" : "Add"} Supplier`,
+                e.toString(),
+            );
+        }
     }
 
     return (
@@ -47,6 +94,16 @@ export default function SuppliersModal({
                         onChange={(e) =>
                             form.setValues({
                                 name: e.target.value,
+                            })
+                        }
+                    />
+                    <TextInput
+                        required
+                        label={"Address"}
+                        value={form.values.address}
+                        onChange={(e) =>
+                            form.setValues({
+                                address: e.target.value,
                             })
                         }
                     />

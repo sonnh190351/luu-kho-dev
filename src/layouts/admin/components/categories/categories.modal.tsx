@@ -44,18 +44,29 @@ export default function CategoriesModal({
     async function handleSubmit() {
         try {
             const service = InventoryService.getInstance();
-            await service.addItemWithUniqueName(
-                DatabaseTables.Categories,
-                form.getValues(),
-            );
+            if (isEdit) {
+                await service.editItemName(DatabaseTables.Categories, {
+                    id: category?.id,
+                    ...form.getValues(),
+                });
+            } else {
+                await service.addItemWithUniqueName(
+                    DatabaseTables.Categories,
+                    form.getValues(),
+                );
+            }
+
             refresh();
             handleClose();
             NotificationsService.success(
-                "Add Category",
-                "New category has been added successfully!",
+                `${isEdit ? "Edit" : "Add"} Category`,
+                `New category has been ${isEdit ? "edit" : "added"} successfully!`,
             );
         } catch (e: any) {
-            NotificationsService.error("Add Category", e.toString());
+            NotificationsService.error(
+                `${isEdit ? "Edit" : "Add"} Category`,
+                e.toString(),
+            );
         }
     }
 

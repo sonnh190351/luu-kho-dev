@@ -1,6 +1,10 @@
 import { Button, Modal, Stack, TextInput } from "@mantine/core";
 import { useForm } from "@mantine/form";
 import type { Warehouses } from "../../../../models/warehouses.ts";
+import { useEffect } from "react";
+import InventoryService from "../../../../services/operations/inventory.service.ts";
+import { NotificationsService } from "../../../../services/notifications/notifications.service.ts";
+import { DatabaseTables } from "../../../../enums/tables.ts";
 
 interface WarehousesModalProps {
     warehouse: Warehouses | null;
@@ -20,18 +24,59 @@ export default function WarehousesModal({
     close,
     refresh,
 }: WarehousesModalProps) {
-    const isEdit = warehouse !== null;
+    const isEdit = Boolean(warehouse);
 
     const form = useForm<WarehousesFormValues>({
         initialValues: {
-            name: isEdit ? warehouse.name! : "",
-            address: isEdit ? warehouse.address! : "",
+            name: "",
+            address: "",
         },
         validate: {},
     });
 
-    function handleSubmit() {
-        refresh();
+    useEffect(() => {
+        if (warehouse) {
+            form.setValues({
+                name: warehouse.name!,
+                address: warehouse.address!,
+            });
+        }
+    }, [isEdit]);
+
+    function handleClose() {
+        form.reset();
+        close();
+    }
+
+    async function handleSubmit() {
+        try {
+            const service = InventoryService.getInstance();
+
+            if (isEdit) {
+                await service.editItemName(DatabaseTables.Warehouses, {
+                    id: warehouse?.id,
+                    ...form.getValues(),
+                });
+            } else {
+                await service.addItemWithUniqueName(
+                    DatabaseTables.Warehouses,
+                    form.getValues(),
+                );
+            }
+
+            refresh();
+            handleClose();
+
+            NotificationsService.success(
+                `${isEdit ? "Edit" : "Add"} Warehouse`,
+                "New warehouse has been added successfully!",
+            );
+        } catch (e: any) {
+            NotificationsService.error(
+                `${isEdit ? "Edit" : "Add"} Warehouse`,
+                e.toString(),
+            );
+        }
     }
 
     return (

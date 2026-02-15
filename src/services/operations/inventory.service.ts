@@ -33,6 +33,34 @@ export default class InventoryService {
         return response.data;
     }
 
+    public async editItemName(table: DatabaseTables, data: any) {
+        const matching = await this.database.getByField(
+            table,
+            "name",
+            data.name,
+        );
+
+        if (matching.error) {
+            throw matching.error;
+        }
+
+        if (!matching.data) {
+            throw `Invalid response data!`;
+        }
+
+        if (matching.data.length > 0) {
+            for (let i = 0; i < matching.data.length; i++) {
+                if (matching.data[i].id !== data.id) {
+                    throw `Duplicate name in table: "${data.name}"!`;
+                }
+            }
+        }
+
+        return await this.database.edit(table, data.id, {
+            name: data.name,
+        });
+    }
+
     public async addItemWithUniqueName(table: DatabaseTables, data: any) {
         const matching = await this.database.getByField(
             table,

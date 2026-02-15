@@ -40,4 +40,8 @@ export default class DatabaseService {
     public async delete(table: DatabaseTables, id: any) {
         await this.database.from(table).delete().eq("id", id);
     }
+
+    public async edit(table: DatabaseTables, id: any, data: any) {
+        await this.database.from(table).update(data).eq("id", id);
+    }
 }

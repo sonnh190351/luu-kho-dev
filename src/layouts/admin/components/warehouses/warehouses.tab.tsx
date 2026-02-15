@@ -15,12 +15,14 @@ import {
     IconSearch,
     IconTrash,
 } from "@tabler/icons-react";
-import {useEffect, useState} from "react";
-import type {Warehouses} from "../../../../models/warehouses.ts";
+import { useEffect, useState } from "react";
+import type { Warehouses } from "../../../../models/warehouses.ts";
 import CommonTable from "../../../../components/dataTable/common.table.tsx";
 import InventoryService from "../../../../services/operations/inventory.service.ts";
 import WarehousesModal from "./warehouses.modal.tsx";
-import {DatabaseTables} from "../../../../enums/tables.ts";
+import { DatabaseTables } from "../../../../enums/tables.ts";
+import { InformationService } from "../../../../services/notifications/information.service.ts";
+import { NotificationsService } from "../../../../services/notifications/notifications.service.ts";
 
 export default function WarehousesTab() {
     const [items, setWarehouses] = useState<Warehouses[]>([]);
@@ -50,9 +52,9 @@ export default function WarehousesTab() {
             accessor: "id",
             title: "ID",
             sortable: true,
-            render: ({id}: Warehouses, index: number) => {
+            render: ({ id }: Warehouses, index: number) => {
                 return (
-                    <Group key={`item-id-${index}`}>
+                    <Group>
                         <Text>{id}</Text>
                     </Group>
                 );
@@ -62,48 +64,78 @@ export default function WarehousesTab() {
             accessor: "name",
             title: "Name",
             sortable: true,
-            render: ({name}: Warehouses, index: number) => {
-                return <Group key={`item-name-${index}`}>{name}</Group>;
+            render: ({ name }: Warehouses, index: number) => {
+                return <Group>{name}</Group>;
+            },
+        },
+        {
+            accessor: "address",
+            title: "Address",
+            sortable: true,
+            render: ({ address }: Warehouses, index: number) => {
+                return <Group>{address}</Group>;
             },
         },
         {
             accessor: "created_at",
             title: "Created At",
             sortable: true,
-            render: ({created_at}: Warehouses, index: number) => {
-                return (
-                    <Group key={`item-created-at-${index}`}>{created_at}</Group>
-                );
+            render: ({ created_at }: Warehouses, index: number) => {
+                return <Group>{created_at}</Group>;
             },
         },
         {
             accessor: "updated_at",
             title: "Last Updated At",
             sortable: true,
-            render: ({updated_at}: Warehouses, index: number) => {
-                return (
-                    <Group key={`item-updated-at-${index}`}>{updated_at}</Group>
-                );
+            render: ({ updated_at }: Warehouses, index: number) => {
+                return <Group>{updated_at}</Group>;
             },
         },
         {
             accessor: "id",
             title: "Actions",
             sortable: true,
-            render: ({id}: Warehouses, index: number) => {
+            render: ({ id }: Warehouses) => {
                 return (
-                    <Group key={`item-actions-id-${index}`}>
-                        <ActionIcon onClick={() => console.log(id)} size={"lg"}>
-                            <IconTrash/>
+                    <Group>
+                        <ActionIcon
+                            onClick={() => handleDelete(id)}
+                            size={"lg"}>
+                            <IconTrash />
                         </ActionIcon>
-                        <ActionIcon size={"lg"}>
-                            <IconEdit/>
+                        <ActionIcon size={"lg"} onClick={() => handleEdit(id)}>
+                            <IconEdit />
                         </ActionIcon>
                     </Group>
                 );
             },
         },
     ];
+
+    function handleDelete(id: number) {
+        InformationService.getInstance().confirm(async () => {
+            try {
+                const service = InventoryService.getInstance();
+                await service.deleteById(DatabaseTables.Warehouses, id);
+                NotificationsService.success(
+                    "Delete Warehouse",
+                    "Warehouse has been deleted!",
+                );
+            } catch (e: any) {
+                NotificationsService.error("Delete Warehouse", e.toString());
+            }
+            await fetchWarehouses();
+        });
+    }
+
+    function handleEdit(id: number) {
+        const matching = items.find((c) => c.id === id);
+        if (matching) {
+            setSelectedItem(matching);
+            setOpenItemModal(true);
+        }
+    }
 
     return (
         <>
@@ -120,27 +152,27 @@ export default function WarehousesTab() {
                                 onChange={(e) => setKeyword(e.target.value)}
                             />
                             <ActionIcon size={"lg"}>
-                                <IconSearch/>
+                                <IconSearch />
                             </ActionIcon>
                         </Group>
                     </Stack>
-                    <Divider orientation={"vertical"}/>
+                    <Divider orientation={"vertical"} />
                     <Stack gap={5}>
                         <Text>Controls</Text>
                         <Group>
                             <Button
                                 onClick={() => setOpenItemModal(true)}
-                                leftSection={<IconPlus/>}>
+                                leftSection={<IconPlus />}>
                                 Add
                             </Button>
-                            <Button leftSection={<IconRefresh/>}>
+                            <Button leftSection={<IconRefresh />}>
                                 Refresh
                             </Button>
                         </Group>
                     </Stack>
                 </Group>
 
-                <CommonTable data={items} columns={columns}/>
+                <CommonTable data={items} columns={columns} />
             </Stack>
 
             {/*Item modal*/}

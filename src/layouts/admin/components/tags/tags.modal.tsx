@@ -43,10 +43,18 @@ export default function TagsModal({
     async function handleSubmit() {
         try {
             const service = InventoryService.getInstance();
-            await service.addItemWithUniqueName(
-                DatabaseTables.Tags,
-                form.getValues(),
-            );
+
+            if (isEdit) {
+                await service.editItemName(DatabaseTables.Tags, {
+                    id: tag?.id,
+                    ...form.getValues(),
+                });
+            } else {
+                await service.addItemWithUniqueName(
+                    DatabaseTables.Tags,
+                    form.getValues(),
+                );
+            }
             refresh();
             handleClose();
             NotificationsService.success(
