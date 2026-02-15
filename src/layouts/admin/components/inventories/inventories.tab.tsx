@@ -21,6 +21,8 @@ import CommonTable from "../../../../components/dataTable/common.table.tsx";
 import InventoryService from "../../../../services/operations/inventory.service.ts";
 import InventoriesModal from "./inventories.modal.tsx";
 import { DatabaseTables } from "../../../../enums/tables.ts";
+import { InformationService } from "../../../../services/notifications/information.service.ts";
+import { NotificationsService } from "../../../../services/notifications/notifications.service.ts";
 
 export default function InventoriesTab() {
     const [items, setInventories] = useState<Inventories[]>([]);
@@ -93,10 +95,12 @@ export default function InventoriesTab() {
             render: ({ id }: Inventories, index: number) => {
                 return (
                     <Group key={`item-actions-id-${index}`}>
-                        <ActionIcon onClick={() => console.log(id)} size={"lg"}>
+                        <ActionIcon
+                            onClick={() => handleDelete(id)}
+                            size={"lg"}>
                             <IconTrash />
                         </ActionIcon>
-                        <ActionIcon size={"lg"}>
+                        <ActionIcon size={"lg"} onClick={() => handleEdit(id)}>
                             <IconEdit />
                         </ActionIcon>
                     </Group>
@@ -104,6 +108,30 @@ export default function InventoriesTab() {
             },
         },
     ];
+
+    function handleDelete(id: number) {
+        InformationService.getInstance().confirm(async () => {
+            try {
+                const service = InventoryService.getInstance();
+                await service.deleteById(DatabaseTables.Inventories, id);
+                NotificationsService.success(
+                    "Delete Inventory",
+                    "Inventory has been deleted!",
+                );
+            } catch (e: any) {
+                NotificationsService.error("Delete Inventory", e.toString());
+            }
+            await fetchInventories();
+        });
+    }
+
+    function handleEdit(id: number) {
+        const matching = items.find((i) => i.id === id);
+        if (matching) {
+            setSelectedItem(matching);
+            setOpenItemModal(true);
+        }
+    }
 
     return (
         <>

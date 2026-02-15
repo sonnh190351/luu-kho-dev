@@ -21,6 +21,8 @@ import CommonTable from "../../../../components/dataTable/common.table.tsx";
 import InventoryService from "../../../../services/operations/inventory.service.ts";
 import TagsModal from "./tags.modal.tsx";
 import { DatabaseTables } from "../../../../enums/tables.ts";
+import { InformationService } from "../../../../services/notifications/information.service.ts";
+import { NotificationsService } from "../../../../services/notifications/notifications.service.ts";
 
 export default function TagsTab() {
     const [items, setTags] = useState<Tags[]>([]);
@@ -93,10 +95,12 @@ export default function TagsTab() {
             render: ({ id }: Tags, index: number) => {
                 return (
                     <Group key={`item-actions-id-${index}`}>
-                        <ActionIcon onClick={() => console.log(id)} size={"lg"}>
+                        <ActionIcon
+                            onClick={() => handleDelete(id)}
+                            size={"lg"}>
                             <IconTrash />
                         </ActionIcon>
-                        <ActionIcon size={"lg"}>
+                        <ActionIcon size={"lg"} onClick={() => handleEdit(id)}>
                             <IconEdit />
                         </ActionIcon>
                     </Group>
@@ -104,6 +108,30 @@ export default function TagsTab() {
             },
         },
     ];
+
+    function handleDelete(id: number) {
+        InformationService.getInstance().confirm(async () => {
+            try {
+                const service = InventoryService.getInstance();
+                await service.deleteById(DatabaseTables.Tags, id);
+                NotificationsService.success(
+                    "Delete Tag",
+                    "Tag has been deleted!",
+                );
+            } catch (e: any) {
+                NotificationsService.error("Delete Tag", e.toString());
+            }
+            await fetchTags();
+        });
+    }
+
+    function handleEdit(id: number) {
+        const matching = items.find((i) => i.id === id);
+        if (matching) {
+            setSelectedItem(matching);
+            setOpenItemModal(true);
+        }
+    }
 
     return (
         <>

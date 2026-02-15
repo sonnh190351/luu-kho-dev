@@ -1,8 +1,8 @@
-import {Button, Grid, Modal, Select, Stack, TextInput} from "@mantine/core";
+import { Button, Grid, Modal, Select, Stack, TextInput } from "@mantine/core";
 import { useForm } from "@mantine/form";
 import type { UserDetails } from "../../../../models/user.ts";
-import {USER_ROLES} from "../../../../enums/roles.ts";
-import {DatePicker, DatePickerInput} from "@mantine/dates";
+import { USER_ROLES } from "../../../../enums/roles.ts";
+import { DatePicker, DatePickerInput } from "@mantine/dates";
 
 interface UserDetailsModalProps {
     user: UserDetails | null;
@@ -22,11 +22,11 @@ interface UserDetailsFormValues {
 }
 
 export default function UserDetailsModal({
-                                            user,
-                                            open = false,
-                                            close,
-                                            refresh,
-                                        }: UserDetailsModalProps) {
+    user,
+    open = false,
+    close,
+    refresh,
+}: UserDetailsModalProps) {
     const isEdit = user !== null;
 
     const form = useForm<UserDetailsFormValues>({
@@ -74,22 +74,36 @@ export default function UserDetailsModal({
                             })
                         }
                     />
-                    <DatePickerInput label={"Date of Birth"} required={true} value={form.values.dob} onChange={(e) => {
-                        if(e) {
-                            form.setValues({
-                                dob: new Date(e.getDate())
-                            })
-                        }
-                    }} />
-                    <Select value={String(form.values.role)} onChange={(value) => {
-                        if (value) {
-                            form.setValues({
-                                role: Number(value)
-                            })
-                        }
-                    }} required searchable label={'Role'} data={Object.entries(USER_ROLES).map(([k, v]) => {
-                        return { label: k, value: String(v) }
-                    })}/>
+                    <DatePickerInput
+                        label={"Date of Birth"}
+                        required={true}
+                        value={form.values.dob}
+                        onChange={(e) => {
+                            if (e) {
+                                form.setValues({
+                                    dob: new Date(e.getDate()),
+                                });
+                            }
+                        }}
+                    />
+                    <Select
+                        value={String(form.values.role)}
+                        onChange={(value) => {
+                            if (value) {
+                                form.setValues({
+                                    role: Number(value),
+                                });
+                            }
+                        }}
+                        required
+                        searchable
+                        label={"Role"}
+                        data={Object.entries(USER_ROLES)
+                            .filter(([_, v]) => v > 0)
+                            .map(([k, v]) => {
+                                return { label: k, value: String(v) };
+                            })}
+                    />
 
                     <TextInput
                         required

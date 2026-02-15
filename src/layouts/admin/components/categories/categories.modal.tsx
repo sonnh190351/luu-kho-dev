@@ -1,6 +1,10 @@
 import { Button, Modal, Stack, TextInput } from "@mantine/core";
 import { useForm } from "@mantine/form";
 import type { Categories } from "../../../../models/categories.ts";
+import InventoryService from "../../../../services/operations/inventory.service.ts";
+import { NotificationsService } from "../../../../services/notifications/notifications.service.ts";
+import { useEffect } from "react";
+import { DatabaseTables } from "../../../../enums/tables.ts";
 
 interface CategoriesModalProps {
     category: Categories | null;
@@ -19,23 +23,51 @@ export default function CategoriesModal({
     close,
     refresh,
 }: CategoriesModalProps) {
-    const isEdit = category !== null;
+    const isEdit = Boolean(category);
+    console.log(category);
 
     const form = useForm<CategoriesFormValues>({
         initialValues: {
-            name: isEdit ? category.name! : "",
+            name: "",
         },
         validate: {},
     });
 
-    function handleSubmit() {
-        refresh();
+    useEffect(() => {
+        if (category) {
+            form.setValues({
+                name: category.name!,
+            });
+        }
+    }, [isEdit]);
+
+    async function handleSubmit() {
+        try {
+            const service = InventoryService.getInstance();
+            await service.addItemWithUniqueName(
+                DatabaseTables.Categories,
+                form.getValues(),
+            );
+            refresh();
+            handleClose();
+            NotificationsService.success(
+                "Add Category",
+                "New category has been added successfully!",
+            );
+        } catch (e: any) {
+            NotificationsService.error("Add Category", e.toString());
+        }
+    }
+
+    function handleClose() {
+        form.reset();
+        close();
     }
 
     return (
         <Modal
             opened={open}
-            onClose={close}
+            onClose={handleClose}
             centered
             title={isEdit ? "Edit Category" : "Add Category"}>
             <form onSubmit={form.onSubmit(handleSubmit)}>

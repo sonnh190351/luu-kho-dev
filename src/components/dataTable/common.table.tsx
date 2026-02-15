@@ -2,6 +2,7 @@ import type { DataTableProps } from "./table.types.ts";
 import { DataTable } from "mantine-datatable";
 import { useEffect, useState } from "react";
 import sortBy from "lodash/sortBy";
+import UtilsService from "../../services/utils.ts";
 
 const PAGE_SIZE = 15;
 
@@ -32,6 +33,7 @@ export default function CommonTable({ data, columns }: DataTableProps) {
             style={{
                 width: "100%",
             }}
+            idAccessor={"id"}
             sortStatus={sortStatus}
             onSortStatusChange={setSortStatus}
             withTableBorder

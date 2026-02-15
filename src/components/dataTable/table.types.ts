@@ -1,4 +1,6 @@
+import type { DataTableColumn } from "mantine-datatable";
+
 export interface DataTableProps {
-    data: any[],
-    columns: any[]
+    data: any[];
+    columns: DataTableColumn[];
 }

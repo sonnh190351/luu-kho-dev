@@ -1,6 +1,10 @@
 import { Button, Modal, Stack, TextInput } from "@mantine/core";
 import { useForm } from "@mantine/form";
 import type { Tags } from "../../../../models/tags.ts";
+import InventoryService from "../../../../services/operations/inventory.service.ts";
+import { NotificationsService } from "../../../../services/notifications/notifications.service.ts";
+import { useEffect } from "react";
+import { DatabaseTables } from "../../../../enums/tables.ts";
 
 interface TagsModalProps {
     tag: Tags | null;
@@ -19,23 +23,50 @@ export default function TagsModal({
     close,
     refresh,
 }: TagsModalProps) {
-    const isEdit = tag !== null;
+    const isEdit = Boolean(tag);
 
     const form = useForm<TagsFormValues>({
         initialValues: {
-            name: isEdit ? tag.name! : "",
+            name: "",
         },
         validate: {},
     });
 
-    function handleSubmit() {
-        refresh();
+    useEffect(() => {
+        if (tag) {
+            form.setValues({
+                name: tag.name!,
+            });
+        }
+    }, [isEdit]);
+
+    async function handleSubmit() {
+        try {
+            const service = InventoryService.getInstance();
+            await service.addItemWithUniqueName(
+                DatabaseTables.Tags,
+                form.getValues(),
+            );
+            refresh();
+            handleClose();
+            NotificationsService.success(
+                "Add Tag",
+                "New tag has been added successfully!",
+            );
+        } catch (e: any) {
+            NotificationsService.error("Add Tag", e.toString());
+        }
+    }
+
+    function handleClose() {
+        form.reset();
+        close();
     }
 
     return (
         <Modal
             opened={open}
-            onClose={close}
+            onClose={handleClose}
             centered
             title={isEdit ? "Edit Tag" : "Add Tag"}>
             <form onSubmit={form.onSubmit(handleSubmit)}>

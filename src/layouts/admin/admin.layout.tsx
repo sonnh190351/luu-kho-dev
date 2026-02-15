@@ -129,7 +129,7 @@ export default function AdminLayout() {
                     }}>
                     <Stack p={5} gap={0}>
                         {adminTabs.map((tab: TabGroup, tab_index: number) => (
-                            <Stack gap={0}>
+                            <Stack gap={0} key={`tab-item-${tab_index}`}>
                                 <Text
                                     mt={"sm"}
                                     pl={10}
